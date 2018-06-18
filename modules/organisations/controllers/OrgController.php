@@ -2,10 +2,13 @@
 
 namespace app\modules\organisations\controllers;
 
+use app\models\custom\GeoApi;
+use mirocow\yandexmaps\GeoObjectCollection;
 use Yii;
 use app\models\Clubs;
 use app\models\Organisations;
 use yii\data\ActiveDataProvider;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 
 class OrgController extends Controller
@@ -75,7 +78,54 @@ class OrgController extends Controller
         ]);
 
     } // end action
-    
+
+
+
+    /**
+     *
+     *
+     * @return bool|\SimpleXMLElement|string
+     */
+    public function actionCheckaddress()
+    {
+
+        if (Yii::$app->request->isAjax && isset($_POST['address'])) {
+
+            $result = '';
+
+            $result = GeoApi::request(['address' => $_POST['address'], 'json' => false]);
+            //$result = json_decode(json_encode($result), TRUE);
+            //$result = $result['GeoObjectCollection'];
+
+            /*if (isset($result['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'])) {
+                $flag = $result['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'];
+            }*/
+
+            $result = GeoApi::getExact($result);
+
+            if (isset($result['precision']) && $result['precision'] == 'exact') {
+                $flag = 'exact';
+            } else {
+                $flag = 'notfound';
+            }
+
+            $flag = 'exact';
+
+            if ($flag == 'exact') {
+                return $this->renderAjax('ajax/search', [
+                    'flag' => $flag,
+                    'data' => $result
+                ]);
+            } else {
+                return $this->renderAjax('ajax/error');
+            }
+
+        }
+
+        return false;
+
+    } // end action
+
 
 
     /**
@@ -86,6 +136,10 @@ class OrgController extends Controller
      */
     public function actionAddclub($orgid)
     {
+
+        GeoApi::request(['address' => 'Москва', 'json' => false]);
+
+        isset($_POST['address']) ? $request = '' : $request = '<b id="result" style="color: red;">Адрес не проверен</b>';
 
         $newclub = new Clubs();
         $newclub->org_id = $orgid;
@@ -100,11 +154,9 @@ class OrgController extends Controller
             }
         }
 
-        $request = '<b style="color: red;">Адрес не проверен</b>';
-
-        if (isset($_POST['address'])) {
+        /*if (isset($_POST['address'])) {
             $request = GeoApi::geoRequest(['adress' => $_POST['address'], 'json' => true, 'kind' => 'metro']);
-        }
+        }*/
 
         // view
         return $this->render('addclub', [
