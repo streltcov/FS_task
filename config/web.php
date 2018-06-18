@@ -6,10 +6,16 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
+    'language' => 'ru',
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+    ],
+    'modules' => [
+        'organisations' => [
+            'class' => 'app\modules\organisations\OrganisationModule'
+        ],
     ],
     'components' => [
         'request' => [

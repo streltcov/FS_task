@@ -7,6 +7,7 @@ use yii\db\Migration;
  */
 class m180616_181503_users extends Migration
 {
+
     /**
      * {@inheritdoc}
      */
@@ -23,30 +24,24 @@ class m180616_181503_users extends Migration
             'accessToken' => $this->string()
         ]);
 
-    }
+        $this->batchInsert('users', ['username', 'password'], [
+            ['admin', 'admin']
+        ]);
+
+    } // end function
+
+
 
     /**
      * {@inheritdoc}
      */
     public function safeDown()
     {
-        echo "m180616_181503_users cannot be reverted.\n";
 
-        return false;
-    }
+        $this->dropTable('users');
 
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
+        return true;
 
-    }
+    } // end function
 
-    public function down()
-    {
-        echo "m180616_181503_users cannot be reverted.\n";
-
-        return false;
-    }
-    */
-}
+} // end class

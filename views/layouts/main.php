@@ -12,9 +12,14 @@ use app\assets\AppAsset;
 
 AppAsset::register($this);
 ?>
+
+
+
 <?php $this->beginPage() ?>
+
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
+
 <head>
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,7 +28,9 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
+
 <body>
+
 <?php $this->beginBody() ?>
 
 <div class="wrap">
@@ -37,10 +44,24 @@ AppAsset::register($this);
     ]);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
+        'encodeLabels' => false,
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => 'Test', 'url' => ['/test']],
+                [
+                    'label' => 'Организации',
+                    'items' => [
+                        ['label' => 'Список', 'url' => ['/organisations']],
+                        ['label' => 'Добавить', 'url' => ['/organisations/org/addorg']]
+                    ],
+                ],
+                [
+                    'label' => 'Клубы',
+                    'items' => [
+                            ['label' => 'Список', 'url' => ['/organisations/org/clubs']],
+                            //['label' => 'Добавить', 'url' => ['/organisations/org/addclub']]
+                    ]
+                ],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
