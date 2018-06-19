@@ -2,6 +2,7 @@
 
 namespace app\modules\organisations\controllers;
 
+use app\models\ClubContext;
 use app\models\custom\GeoApi;
 use mirocow\yandexmaps\GeoObjectCollection;
 use Yii;
@@ -93,31 +94,47 @@ class OrgController extends Controller
 
             $result = '';
 
-            $result = GeoApi::request(['address' => $_POST['address'], 'json' => false]);
-            //$result = json_decode(json_encode($result), TRUE);
-            //$result = $result['GeoObjectCollection'];
+            $result = GeoApi::getExact(GeoApi::getGeocode(['address' => $_POST['address'], 'json' => false]));
 
-            /*if (isset($result['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'])) {
-                $flag = $result['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'];
-            }*/
-
-            $result = GeoApi::getExact($result);
-
-            if (isset($result['precision']) && $result['precision'] == 'exact') {
+            if ($result != '') {
                 $flag = 'exact';
             } else {
-                $flag = 'notfound';
+                $flag = 'not found';
             }
 
-            $flag = 'exact';
+            $district = json_decode(json_encode(GeoApi::getContext([
+                'coordinates' => $result['fc'],
+                'kind' => 'district'
+            ])), TRUE);
+
+            $district = $district['GeoObjectCollection']['featureMember'][0]['GeoObject'];
+            $context['district'] = $district['name'];
+            $context['locality'] = $district['description'];
+
+            $metro = json_decode(json_encode(GeoApi::getContext([
+                'coordinates' => $result['fc'],
+                'kind' => 'metro'
+            ])), TRUE);
+
+            $metro = $metro['GeoObjectCollection'];
+
+            /*foreach ($metro as $key => $featureMember) {
+                if ($key == 'featureMember') {
+
+                }
+            }*/
+
 
             if ($flag == 'exact') {
                 return $this->renderAjax('ajax/search', [
-                    'flag' => $flag,
+                    'metro' => $metro,
+                    'context' => $context,
                     'data' => $result
                 ]);
             } else {
-                return $this->renderAjax('ajax/error');
+                return $this->renderAjax('ajax/error', [
+                    'flag' => $flag
+                ]);
             }
 
         }
@@ -137,16 +154,21 @@ class OrgController extends Controller
     public function actionAddclub($orgid)
     {
 
-        GeoApi::request(['address' => 'Москва', 'json' => false]);
+        //GeoApi::request(['address' => 'Москва', 'json' => false]);
 
         isset($_POST['address']) ? $request = '' : $request = '<b id="result" style="color: red;">Адрес не проверен</b>';
 
         $newclub = new Clubs();
         $newclub->org_id = $orgid;
 
+        $newclubcontext = new ClubContext();
+        $newclubcontext->club_id = $orgid;
+
         // adding new club
         if (Yii::$app->request->post()) {
             if ($newclub->load(Yii::$app->request->post()) && $newclub->save()) {
+                $newclubcontext->load(Yii::$app->request->post());
+                $newclubcontext->save();
                 Yii::$app->session->setFlash('success', 'Клуб добавлен');
                 $newclub = new Clubs();
             } else {
@@ -154,12 +176,9 @@ class OrgController extends Controller
             }
         }
 
-        /*if (isset($_POST['address'])) {
-            $request = GeoApi::geoRequest(['adress' => $_POST['address'], 'json' => true, 'kind' => 'metro']);
-        }*/
-
         // view
         return $this->render('addclub', [
+            'context' => $newclubcontext,
             'club' => $newclub,
             'request' => $request
         ]);

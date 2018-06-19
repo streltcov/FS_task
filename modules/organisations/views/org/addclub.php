@@ -6,6 +6,7 @@ use yii\helpers\Html;
 /* @var $request string */
 /* @var $this \yii\web\View */
 /* @var $club \app\models\Clubs */
+/* @var $context \app\models\ClubContext */
 
 ?>
 
@@ -21,7 +22,9 @@ use yii\helpers\Html;
                 $form = ActiveForm::begin();
                 echo $form->field($club, 'name')->textInput();
                 echo $form->field($club, 'address')->textInput();
-                echo Html::submitButton('Сохранить', ['id' => 'addressinput', 'class' => 'btn btn-info']);
+                echo $form->field($context, 'district')->hiddenInput()->label(false);
+                echo $form->field($context, 'locality')->hiddenInput()->label(false);
+                echo Html::submitButton('Сохранить', ['id' => 'addressinput']);
                 ActiveForm::end();
 
                 ?>
@@ -45,14 +48,11 @@ use yii\helpers\Html;
 <script>
 
     $(document).ready(function() {
-        alert('loaded');
+        //alert('loaded');
+        $('#addressinput').addClass('btn btn-default disabled');
     });
 
-    //let address = $('#clubs-address').val();
-
     $('#clubs-address').keyup(function () {
-        //console.log(address);
-
         $.ajax({
             url: "/organisations/org/checkaddress",
             type: "post",
@@ -60,6 +60,25 @@ use yii\helpers\Html;
             data: {address: $('#clubs-address').val()},
             success: function (response) {
                 $('#address').html(response);
+                $(document).ready(function () {
+                    let validation = $('input[name="validation"]').val();
+                    //console.log(validation);
+                    switch (validation) {
+                        case '1':
+                            $('#addressinput').removeClass('btn btn-default disabled');
+                            $('#addressinput').addClass('btn btn-info');
+                            break;
+                        default:
+                            $('#addressinput').addClass('btn btn-default disabled');
+                            break;
+                    }
+                });
+
+                /*let district = $('input[name="district"]').val();
+                console.log(district);
+                let locality = $('input[name="locality"]').val();
+                $('#district').val(district);
+                $('#locality').val(locality);*/
             },
             error: function (req, text, error) {
                 $('#address').text(text + '; type - ' + error);
