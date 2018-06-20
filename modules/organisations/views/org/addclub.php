@@ -24,6 +24,7 @@ use yii\helpers\Html;
                 echo $form->field($club, 'address')->textInput();
                 echo $form->field($context, 'district')->hiddenInput()->label(false);
                 echo $form->field($context, 'locality')->hiddenInput()->label(false);
+                echo Html::button('Проверить адрес', ['id' => 'checkbutton', 'class' => 'btn btn-default']);
                 echo Html::submitButton('Сохранить', ['id' => 'addressinput']);
                 ActiveForm::end();
 
@@ -52,7 +53,7 @@ use yii\helpers\Html;
         $('#addressinput').addClass('btn btn-default disabled');
     });
 
-    $('#clubs-address').keyup(function () {
+    $('#checkbutton').on('click', function () {
         $.ajax({
             url: "/organisations/org/checkaddress",
             type: "post",
@@ -62,7 +63,6 @@ use yii\helpers\Html;
                 $('#address').html(response);
                 $(document).ready(function () {
                     let validation = $('input[name="validation"]').val();
-                    //console.log(validation);
                     switch (validation) {
                         case '1':
                             $('#addressinput').removeClass('btn btn-default disabled');
@@ -74,11 +74,13 @@ use yii\helpers\Html;
                     }
                 });
 
-                /*let district = $('input[name="district"]').val();
-                console.log(district);
+                let realvalue = $('#realaddress').val();
+                $('#clubs-address').val(realvalue);
+
+                let district = $('input[name="district"]').val();
                 let locality = $('input[name="locality"]').val();
-                $('#district').val(district);
-                $('#locality').val(locality);*/
+                $('#district').val(encodeURI(district));
+                $('#locality').val(encodeURI(locality));
             },
             error: function (req, text, error) {
                 $('#address').text(text + '; type - ' + error);

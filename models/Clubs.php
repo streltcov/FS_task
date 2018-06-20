@@ -32,6 +32,7 @@ class Clubs extends \yii\db\ActiveRecord
         return [
             [['name', 'address', 'org_id'], 'required'],
             [['org_id'], 'integer'],
+            [['district'], 'string'],
             [['name', 'address'], 'string', 'max' => 255],
             [['org_id'], 'exist', 'skipOnError' => true, 'targetClass' => Organisations::className(), 'targetAttribute' => ['org_id' => 'id']],
         ];
@@ -45,6 +46,7 @@ class Clubs extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Название',
+            'district' => 'Округ',
             'address' => 'Адрес',
             'org_id' => 'Org ID',
         ];

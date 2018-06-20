@@ -41,6 +41,8 @@ if(!$end) {
 
     echo Html::input('hidden', 'validation', '1', ['id' => 'validation']);
 
+    echo Html::input('hidden', 'district', mb_convert_encoding($data['name'], 'utf-8', mb_detect_encoding($data['name'])), ['id' => 'realaddress']);
+
     echo Html::input('hidden', 'district', $context['district'], ['id' => 'district']);
     echo Html::input('hidden', 'locality', $context['locality'], ['id' => 'locality']);
 

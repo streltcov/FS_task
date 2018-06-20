@@ -12,6 +12,9 @@ use yii\data\ActiveDataProvider;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
 
+header('Content-type: text/html; charset=windows-1251');
+
+
 class OrgController extends Controller
 {
 

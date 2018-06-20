@@ -31,7 +31,7 @@ class ClubContext extends \yii\db\ActiveRecord
     {
         return [
             [['club_id'], 'integer'],
-            [['disctrict', 'locality'], 'string', 'max' => 255],
+            [['district', 'locality'], 'string', 'max' => 255],
             [['club_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clubs::className(), 'targetAttribute' => ['club_id' => 'id']],
         ];
     }
@@ -44,7 +44,7 @@ class ClubContext extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'club_id' => 'Club ID',
-            'disctrict' => 'Disctrict',
+            'district' => 'Disctrict',
             'locality' => 'Locality',
         ];
     }
